@@ -10,10 +10,8 @@ trs = soup.select('#old_content > table > tbody > tr')
 
 for tr in trs :
     a_tag = tr.select_one('td.title > div > a')
-    b_tag = tr.select_one('nth-child(2) > td.point')
-    c_tag = tr.select_one('nth-child(3) > td:nth-child(1) > img')
     if a_tag is not None:
         title = a_tag.text
-        star = b_tag.text
-        rank = c_tag.text
+        star = tr.select_one('td.point').text
+        rank = tr.select_one(' td:nth-child(1) > img')['alt']
         print(rank, title, star)
