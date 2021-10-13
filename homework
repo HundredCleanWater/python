@@ -13,3 +13,5 @@ for tr in trs :
     rank = tr.select_one('td.number').text[0:2].strip()
     artist = tr.select_one('td.info > a.artist.ellipsis').text
     print(rank,title,artist)
+
+##strip()) : 공백을 제거해줘서 깔끔하게 보여준다.
