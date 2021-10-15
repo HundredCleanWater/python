@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="ko">
+<html lang="en">
 
 <head>
     <!-- Required meta tags -->
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
@@ -20,16 +20,16 @@
             integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
             crossorigin="anonymous"></script>
 
-    <title>원페이지쇼핑몰</title>
+    <title>스파르타코딩클럽 | 부트스트랩 연습하기</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
 
     <style>
         * {
-            font-family: 'Do Hyeon', sans-serif;
+            font-family: 'Jua', sans-serif;
         }
 
-        .myitem {
+        .item-img {
             width: 500px;
             height: 300px;
 
@@ -39,93 +39,97 @@
         }
 
         .price {
-            font-size: 16px;
+            font-size: 20px;
         }
 
-        .desc {
+        .item-desc {
             width: 500px;
             margin-top: 20px;
             margin-bottom: 20px;
         }
 
-        .order-box {
+        .item-order {
             width: 500px;
-            margin-bottom: 40px;
+            margin-bottom: 50px;
         }
 
-        .mybtn {
-            width: 100px;
+        .btn-order {
             margin: auto;
+            width: 100px;
+
             display: block;
         }
 
         .wrap {
-            margin: auto;
             width: 500px;
+            margin: auto;
         }
 
         .rate {
             color: blue;
         }
     </style>
-    <script>
 
+    <script>
         $(document).ready(function () {
+            get_rate();
+            listing();
+        });
+
+        function listing() {
+            $.ajax({
+                type: "GET",
+                url: "/order",
+                data: {},
+                success: function (response) {
+                    if (response["result"] == "success") {
+                        let orders = response['orders'];
+                        for (let i = 0; i < orders.length; i++) {
+                            let name = orders[i]['name'];
+                            let count = orders[i]['count'];
+                            let address = orders[i]['address'];
+                            let phone = orders[i]['phone'];
+
+                            let temp_html = `<tr>
+                                                <th scope="row">${name}</th>
+                                                <td>${count}</td>
+                                                <td>${address}</td>
+                                                <td>${phone}</td>
+                                            </tr>`
+                            $('#orders-box').append(temp_html)
+                        }
+                    }
+                }
+            })
+        }
+
+        function get_rate() {
             $.ajax({
                 type: "GET",
                 url: "https://api.manana.kr/exchange/rate.json",
                 data: {},
                 success: function (response) {
-                    let nowRate = response[1]['rate'];
-                    $('#rate-box').text(nowRate);
-                }
-            })
-            order_listing();
-        });
-
-        function order_listing() {
-            // 주문목록 보기 API 연결
-						$.ajax({
-                type: "GET",
-                url: "/order",
-                data: {},
-                success: function (response) {
-                    alert(response["msg"]);
-                    window.location.reload();
-                    let orders = response['all_orders']
-                    for (let i = 0; i < orders.length; i++){
-                            let name = orders[i]['order-name']
-                            let count = orders[i]['order-count']
-                            let address = orders[i]['order-address']
-                            let phone = orders[i]['order-phone']
-
-                            let temp_html=`<tr>
-                                             <td>${name}</td>
-                                             <td>${count}</td>
-                                             <td>${address}</td>
-                                             <td>${phone}</td>
-                                           </tr>`
-                            $('#order-box').append(temp_html)
-                        }
-                    }
-
+                    let now_rate = response[1]['rate'];
+                    $('#now-rate').text(now_rate);
                 }
             })
         }
 
         function order() {
-                let name = $('#order-name').val();
-                let count = $('#order-count').val();
-                let address = $('#order-address').val();
-                let phone = $('#order-phone').val();
-            // 주문하기 API 연결
+            let name = $('#order-name').val();
+            let count = $('#order-count').val();
+            let address = $('#order-address').val();
+            let phone = $('#order-phone').val();
+
             $.ajax({
                 type: "POST",
                 url: "/order",
                 data: {name_give: name, count_give: count, address_give: address, phone_give: phone},
-                success: function (response) { // 성공하면
-                    alert(response["msg"]);
-                    window.location.reload();
+                success: function (response) {
+                    if (response["result"] == "success") {
+                        alert(response["msg"]);
+                        window.location.reload();
+                    }
                 }
             })
         }
@@ -134,17 +138,16 @@
 
 <body>
 <div class="wrap">
-    <div class="myitem"></div>
-    <div class="desc">
+    <div class="item-img"></div>
+    <div class="item-desc">
         <h1>양초를 팝니다 <span class="price">가격:3,000원/개</span></h1>
-        <p>이 양초는 특별한 힘을 가지고 있습니다. 하나 두 개 켜 놓으면 또 다른 촛불을 찾을 수 있죠!</p>
-
-        <p class="rate">달러-원 환율: <span id="rate-box">1,000</span></p>
+        <p>이 양초는 사실 특별한 힘을 지니고 있어요!</p>
+        <p class="rate">달러-원 환율: <span id="now-rate">1219.15</span></p>
     </div>
-    <div class="order-box">
+    <div class="item-order">
         <div class="input-group mb-3">
             <div class="input-group-prepend">
-                <span class="input-group-text" id="inputGroup-sizing-default">주문자이름</span>
+                <span class="input-group-text">주문자이름</span>
             </div>
             <input id="order-name" type="text" class="form-control" aria-label="Default"
                    aria-describedby="inputGroup-sizing-default">
@@ -162,33 +165,32 @@
         </div>
         <div class="input-group mb-3">
             <div class="input-group-prepend">
-                <span class="input-group-text" id="inputGroup-sizing-default">주소</span>
+                <span class="input-group-text">주소</span>
             </div>
             <input id="order-address" type="text" class="form-control" aria-label="Default"
                    aria-describedby="inputGroup-sizing-default">
         </div>
         <div class="input-group mb-3">
             <div class="input-group-prepend">
-                <span class="input-group-text" id="inputGroup-sizing-default">전화번호</span>
+                <span class="input-group-text">전화번호</span>
             </div>
             <input id="order-phone" type="text" class="form-control" aria-label="Default"
                    aria-describedby="inputGroup-sizing-default">
         </div>
-        <button onclick="order()" type="button" class="btn btn-primary mybtn">주문하기</button>
+        <button type="button" onclick="order()" class="btn btn-primary btn-order">주문하기</button>
     </div>
-		<table class="table">
-		  <thead>
-		    <tr>
-		      <th scope="col">이름</th>
-		      <th scope="col">수량</th>
-		      <th scope="col">주소</th>
-		      <th scope="col">전화번호</th>
-		    </tr>
-		  </thead>
-		  <tbody id="order-box">
-
-		  </tbody>
-		</table>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">이름</th>
+            <th scope="col">수량</th>
+            <th scope="col">주소</th>
+            <th scope="col">전화번호</th>
+        </tr>
+        </thead>
+        <tbody id="orders-box">
+        </tbody>
+    </table>
 </div>
 </body>
 
